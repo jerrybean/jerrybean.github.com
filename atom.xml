@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[My Octopress Blog]]></title>
+  <link href="http://jerrybean.github.io/atom.xml" rel="self"/>
+  <link href="http://jerrybean.github.io/"/>
+  <updated>2017-01-08T09:53:44+08:00</updated>
+  <id>http://jerrybean.github.io/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[first]]></title>
+    <link href="http://jerrybean.github.io/blog/2017/01/08/first/"/>
+    <updated>2017-01-08T09:52:26+08:00</updated>
+    <id>http://jerrybean.github.io/blog/2017/01/08/first</id>
+    <content type="html"><![CDATA[<h1>第一篇blog</h1>
+
+<h2>会一直坚持写blog，加油！</h2>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[title]]></title>
+    <link href="http://jerrybean.github.io/blog/2016/12/31/title/"/>
+    <updated>2016-12-31T13:32:03+08:00</updated>
+    <id>http://jerrybean.github.io/blog/2016/12/31/title</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+</feed>
