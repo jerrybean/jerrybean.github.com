@@ -1,9 +1,0 @@
----
-layout: post
-title: "first"
-date: 2017-01-08 09:52:26 +0800
-comments: true
-categories:
----
-# 第一篇blog
-## 会一直坚持写blog，加油！
