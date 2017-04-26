@@ -1,35 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
+  <title><![CDATA[贾斌 Jerry Bean]]></title>
   <link href="http://jerrybean.github.io/atom.xml" rel="self"/>
   <link href="http://jerrybean.github.io/"/>
-  <updated>2017-01-08T09:53:44+08:00</updated>
+  <updated>2017-04-27T00:48:58+08:00</updated>
   <id>http://jerrybean.github.io/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[jerrybean]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
-    <title type="html"><![CDATA[first]]></title>
-    <link href="http://jerrybean.github.io/blog/2017/01/08/first/"/>
-    <updated>2017-01-08T09:52:26+08:00</updated>
-    <id>http://jerrybean.github.io/blog/2017/01/08/first</id>
-    <content type="html"><![CDATA[<h1>第一篇blog</h1>
+    <title type="html"><![CDATA[golang-error处理]]></title>
+    <link href="http://jerrybean.github.io/blog/2017/04/27/golang-error/"/>
+    <updated>2017-04-27T00:14:45+08:00</updated>
+    <id>http://jerrybean.github.io/blog/2017/04/27/golang-error</id>
+    <content type="html"><![CDATA[<h2>Golang error</h2>
 
-<h2>会一直坚持写blog，加油！</h2>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[title]]></title>
-    <link href="http://jerrybean.github.io/blog/2016/12/31/title/"/>
-    <updated>2016-12-31T13:32:03+08:00</updated>
-    <id>http://jerrybean.github.io/blog/2016/12/31/title</id>
-    <content type="html"><![CDATA[
+<h3>什么是 Golang error</h3>
+
+<ol>
+<li>Golang 的 error 是内置的类型,无论是标准包还是各大开源项目中都包含着各种对 error 的处理，   <a href="https://blog.golang.org/error-handling-and-go">golang-error-blog</a> 中有详细的例子。</li>
+<li>Golang 的设计之一就是要在调用处处理 error, 而未采用其它语言(类似python,java) 的try+catch 模式，这样会使得逻辑更加清晰，但是代码中会充斥着各种类似如下片段</li>
+</ol>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> a, err := doSomeThing()
+</span><span class='line'>  if err != nil {
+</span><span class='line'>      log.fatal(err)
+</span><span class='line'>  }</span></code></pre></td></tr></table></div></figure>
+
+
+
 ]]></content>
   </entry>
   
