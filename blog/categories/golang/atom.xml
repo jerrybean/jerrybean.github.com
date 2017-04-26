@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[贾斌 Jerry Bean]]></title>
-  <link href="http://jerrybean.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: golang | 贾斌 Jerry Bean]]></title>
+  <link href="http://jerrybean.github.io/blog/categories/golang/atom.xml" rel="self"/>
   <link href="http://jerrybean.github.io/"/>
   <updated>2017-04-27T00:48:58+08:00</updated>
   <id>http://jerrybean.github.io/</id>
@@ -24,20 +24,14 @@
 
 <ol>
 <li>Golang 的 error 是内置的类型,无论是标准包还是各大开源项目中都包含着各种对 error 的处理，   <a href="https://blog.golang.org/error-handling-and-go">golang-error-blog</a> 中有详细的例子。</li>
-<li>Golang 的设计之一就是要在调用处处理 error, 而未采用其它语言(类似python,java) 的try+catch 模式，这样会使得逻辑更加清晰，但是代码中会充斥着各种类似如下片段</li>
+<li>Golang 的设计之一就是要在调用处处理 error, 而未采用其它语言(类似python,java) 的try+catch 模式，这样会使得逻辑更加清晰，但是代码中会充斥着各种类似如下片段
+<code>
+    a, err := doSomeThing()
+    if err != nil {
+        log.fatal(err)
+    }
+</code></li>
 </ol>
-
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'> a, err := doSomeThing()
-</span><span class='line'>  if err != nil {
-</span><span class='line'>      log.fatal(err)
-</span><span class='line'>  }</span></code></pre></td></tr></table></div></figure>
-
-
 
 ]]></content>
   </entry>
