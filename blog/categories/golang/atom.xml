@@ -4,7 +4,7 @@
   <title><![CDATA[Category: golang | 贾斌 Jerry Bean]]></title>
   <link href="http://jerrybean.github.io/blog/categories/golang/atom.xml" rel="self"/>
   <link href="http://jerrybean.github.io/"/>
-  <updated>2017-04-30T16:55:12+08:00</updated>
+  <updated>2017-04-30T17:09:14+08:00</updated>
   <id>http://jerrybean.github.io/</id>
   <author>
     <name><![CDATA[jerrybean]]></name>
@@ -126,14 +126,14 @@ if err != nil {
 <p>这样的例子是可以实现对于除法的特殊处理，实际上对于业务逻辑来说这样的实现是完全没有问题的，从包的使用的角度来谈，这里是有一些问题的</p>
 
 <ul>
-<li>加减乘除应该是一样的返回结果格式，目前只有除法是返回结果和 error 信息</li>
-<li>当然可以通过给加法、减法、乘法加上相关的 error 返回，及时加上后在调用方也会出现对于 err 是否为 nil 的逻辑判断</li>
+<li>加减乘除应该是一样的返回结果格式，目前只有除法是返回结果和 error 信息当然可以通过给加法、减法、乘法加上相关的 error 返回，及时加上后在调用方也会出现对于 <code>error</code> 是否为 <code>nil</code> 的逻辑判断，但是对于加法来说返回 <code>error</code> 本身是没有意义的</li>
 <li>如果我们限制减法结果不能为负数，即 如果 <code>number1</code> 小于 <code>number2</code>,我门需要返回一个 <code>减数不能小于被减数的 error</code>,在某些情况下是需要打印log,某些情况下是不需要(举这个例子是为了说明业务逻辑中对于error的容忍程度是分场景的，如同样是查 redis，有的业务认为查不到需要报错，有的业务查不到需要去查 db，不报错)。
-关于以上几点，其实参考标准包，可以把 <code>error</code> 放在 <code>struct</code> 中；提供一个 Err() 方法来返回 error，代码调整如下:</li>
+关于以上几点，其实参考标准包，可以把 <code>error</code> 放在 <code>struct</code> 中；提供一个 <code>Err()</code> 方法来返回 <code>error</code>，代码调整如下:</li>
 </ul>
 
 
-<pre><code class="go">import (
+<pre><code class="go">
+import (
     "errors"
 )
 
@@ -220,9 +220,9 @@ func (opt *Operation3) Divide() int {
 </span><span class='line'>
 </span><span class='line'><span class="nx">通过调整后的代码相比于最初</span><span class="err">，</span><span class="nx">有以下改进</span><span class="err">：</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">-</span> <span class="nx">除数等于0时会返回</span> <span class="s">`error`</span> <span class="nx">信息给被调用者</span>
+</span><span class='line'><span class="o">-</span> <span class="nx">除数等于</span> <span class="mi">0</span> <span class="nx">时会返回</span> <span class="s">`error`</span> <span class="nx">信息给被调用者</span>
 </span><span class='line'><span class="o">-</span> <span class="nx">调用者不会修改内部数据</span> <span class="s">`number1`</span> <span class="nx">和</span> <span class="s">`number2`</span>
-</span><span class='line'><span class="o">-</span> <span class="s">`error`</span> <span class="nx">在结构体重可以通过</span> <span class="s">`opt.Err()`</span> <span class="nx">获取</span><span class="err">，</span><span class="nx">可以使得</span> <span class="s">`New`</span> <span class="nx">及其他方法只关注于本身需要返回的</span>
+</span><span class='line'><span class="o">-</span> <span class="s">`error`</span> <span class="nx">在结构体中可以通过</span> <span class="s">`opt.Err()`</span> <span class="nx">获取</span><span class="err">，</span><span class="nx">可以使得</span> <span class="s">`New`</span> <span class="nx">及其他方法只关注于本身需要返回的</span>
 </span><span class='line'><span class="o">-</span> <span class="nx">便于后续包的维护</span><span class="err">，</span><span class="nx">比如</span> <span class="s">`新增乘法结果最大为1000，超过1000需要返回 error`</span><span class="p">,</span> <span class="nx">最初版本的需要将乘法的返回类型由</span> <span class="s">`int`</span> <span class="nx">改为</span> <span class="s">`(int, error)`</span><span class="p">,</span><span class="nx">而调整结构后只需要修改</span> <span class="nx">乘法的逻辑</span><span class="err">，</span><span class="nx">调用者的逻辑都不需要修改</span><span class="p">,</span><span class="nx">即</span><span class="p">:</span>
 </span><span class='line'><span class="p">&lt;</span><span class="o">/</span><span class="nx">code</span><span class="p">&gt;&lt;</span><span class="o">/</span><span class="nx">pre</span><span class="p">&gt;</span>
 </span><span class='line'>
