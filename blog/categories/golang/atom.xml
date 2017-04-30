@@ -4,7 +4,7 @@
   <title><![CDATA[Category: golang | 贾斌 Jerry Bean]]></title>
   <link href="http://jerrybean.github.io/blog/categories/golang/atom.xml" rel="self"/>
   <link href="http://jerrybean.github.io/"/>
-  <updated>2017-04-30T17:09:14+08:00</updated>
+  <updated>2017-04-30T17:12:34+08:00</updated>
   <id>http://jerrybean.github.io/</id>
   <author>
     <name><![CDATA[jerrybean]]></name>
@@ -133,56 +133,56 @@ if err != nil {
 
 
 <pre><code class="go">
-import (
-    "errors"
-)
+    import (
+        "errors"
+    )
 
-type Operation3 struct {
-    number1 int
-    number2 int
-    err     error
-}
-
-var (
-    ErrDivideByZero = errors.New("divide by zero")
-    ErrSubLess      = errors.New("minuend must greater or equal than reduction")
-)
-
-func NewOperation3(a, b int) *Operation3 {
-    var err error
-    if a &lt; b {
-        err = ErrSubLess
+    type Operation3 struct {
+        number1 int
+        number2 int
+        err     error
     }
-    return &amp;Operation3{
-        number1: a,
-        number2: b,
-        err: err
+
+    var (
+        ErrDivideByZero = errors.New("divide by zero")
+        ErrSubLess      = errors.New("minuend must greater or equal than reduction")
+    )
+
+    func NewOperation3(a, b int) *Operation3 {
+        var err error
+        if a &lt; b {
+            err = ErrSubLess
+        }
+        return &amp;Operation3{
+            number1: a,
+            number2: b,
+            err: err
+        }
     }
-}
 
-func (opt *Operation3) Err() error {
-    return opt.err
-}
-
-func (opt *Operation3) Add() int {
-    return opt.number1 + opt.number2
-}
-
-func (opt *Operation3) Sub() int {
-    return opt.number1 - opt.number2
-}
-
-func (opt *Operation3) Multiply() int {
-    return opt.number1 * opt.number2
-}
-
-func (opt *Operation3) Divide() int {
-    if opt.number2 == 0 {
-        opt.err = ErrDivideByZero
-        return 0
+    func (opt *Operation3) Err() error {
+        return opt.err
     }
-    return opt.number1 / opt.number2
-}
+
+    func (opt *Operation3) Add() int {
+        return opt.number1 + opt.number2
+    }
+
+    func (opt *Operation3) Sub() int {
+        return opt.number1 - opt.number2
+    }
+
+    func (opt *Operation3) Multiply() int {
+        return opt.number1 * opt.number2
+    }
+
+    func (opt *Operation3) Divide() int {
+        if opt.number2 == 0 {
+            opt.err = ErrDivideByZero
+            return 0
+        }
+        return opt.number1 / opt.number2
+    }
 </code></pre>
 
 <p>调用的这个包的地方可以用如下方式调用:
