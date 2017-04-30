@@ -113,7 +113,6 @@ categories: Golang
 关于以上几点，其实参考标准包，可以把 `error` 放在 `struct` 中；提供一个 `Err()` 方法来返回 `error`，代码调整如下:
 
 ``` go
-
 	import (
 		"errors"
 	)
