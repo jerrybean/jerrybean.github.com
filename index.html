@@ -89,22 +89,362 @@ Golang 的设计之一就是要在调用处处理 error, &hellip;">
 
 <h3>什么是 Golang error</h3>
 
-<ol>
+<ul>
 <li>Golang 的 error 是内置的类型,无论是标准包还是各大开源项目中都包含着各种对 error 的处理，   <a href="https://blog.golang.org/error-handling-and-go">golang-error-blog</a> 中有详细的例子。</li>
 <li>Golang 的设计之一就是要在调用处处理 error, 而未采用其它语言(类似python,java) 的try+catch 模式，这样会使得逻辑更加清晰，但是代码中会充斥着各种类似如下片段</li>
-</ol>
+</ul>
 
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'> a, err := doSomeThing()
-</span><span class='line'>  if err != nil {
-</span><span class='line'>      log.fatal(err)
-</span><span class='line'>  }</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">a</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">doSomeThing</span><span class="p">()</span>
+</span><span class='line'><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">log</span><span class="p">.</span><span class="nx">fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
+<p></p>
+
+<h3>以 error 为线索优化项目结构</h3>
+
+<p>我们现在需要实现一个包(Golang package)，需要实现两个整数的加减乘除运算方法。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">type</span> <span class="nx">Operation1</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">Number1</span> <span class="kt">int</span>
+</span><span class='line'>    <span class="nx">Number2</span> <span class="kt">int</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>  
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation1</span><span class="p">)</span> <span class="nx">Add</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Number1</span> <span class="o">+</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation1</span><span class="p">)</span> <span class="nx">Sub</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Number1</span> <span class="o">-</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation1</span><span class="p">)</span> <span class="nx">Multiply</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Number1</span> <span class="o">*</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation1</span><span class="p">)</span> <span class="nx">Divide</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Number1</span> <span class="o">/</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Number2</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面这个包的函数是实现了加减乘除的运算，那么有哪些问题呢？</p>
+
+<ul>
+<li>除数是0的情况 Divide 方法没有处理,程序会报 <code>panic: runtime error: integer divide by zero</code> ,会使得调用者的程序 panic,如下：</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">opt</span> <span class="o">:=</span> <span class="nx">Operation1</span><span class="p">{}</span>
+</span><span class='line'><span class="nx">opt</span><span class="p">.</span><span class="nx">Number1</span> <span class="p">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="nx">opt</span><span class="p">.</span><span class="nx">Number2</span> <span class="p">=</span> <span class="mi">0</span>
+</span><span class='line'><span class="nx">opt</span><span class="p">.</span><span class="nx">Divide</span><span class="p">()</span>        
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Number1 和 Number2 为可导出类型的，即可以在包的外部进行赋值运算，其实是可以通过 New 方法，在初始化以外都避免对这两个要运算的值的修改</li>
+</ul>
+
+
+<p>于是，我们修改如下</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>  <span class="s">&quot;errors&quot;</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">type</span> <span class="nx">Operation2</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">number1</span> <span class="kt">int</span>
+</span><span class='line'>  <span class="nx">number2</span> <span class="kt">int</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">NewOperation2</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Operation2</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">Operation2</span><span class="p">{</span>
+</span><span class='line'>      <span class="nx">number1</span><span class="p">:</span> <span class="nx">a</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">number2</span><span class="p">:</span> <span class="nx">b</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation2</span><span class="p">)</span> <span class="nx">Add</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">+</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation2</span><span class="p">)</span> <span class="nx">Sub</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">-</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation2</span><span class="p">)</span> <span class="nx">Multiply</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">*</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation2</span><span class="p">)</span> <span class="nx">Divide</span><span class="p">()</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">err</span> <span class="o">:=</span> <span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;integer divide by zero&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">err</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">/</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span><span class="p">,</span> <span class="kc">nil</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样的话关于除法部分调用如下:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">opt</span> <span class="o">:=</span> <span class="nx">NewOperation2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'><span class="nx">result</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Divide</span><span class="p">()</span>
+</span><span class='line'><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">log</span><span class="p">.</span><span class="nx">Errof</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">Error</span><span class="p">())</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样的例子是可以实现对于除法的特殊处理，实际上对于业务逻辑来说这样的实现是完全没有问题的，从包的使用的角度来谈，这里是有一些问题的</p>
+
+<ul>
+<li>加减乘除应该是一样的返回结果格式，目前只有除法是返回结果和 error 信息</li>
+<li>当然可以通过给加法、减法、乘法加上相关的 error 返回，及时加上后在调用方也会出现对于 err 是否为 nil 的逻辑判断</li>
+<li>如果我们限制减法结果不能为负数，即 如果 <code>number1</code> 小于 <code>number2</code>,我门需要返回一个 <code>减数不能小于被减数的 error</code>,在某些情况下是需要打印log,某些情况下是不需要(举这个例子是为了说明业务逻辑中对于error的容忍程度是分场景的，如同样是查 redis，有的业务认为查不到需要报错，有的业务查不到需要去查 db，不报错)。
+关于以上几点，其实参考标准包，可以把 <code>error</code> 放在 <code>struct</code> 中；提供一个 Err() 方法来返回 error，代码调整如下:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>  <span class="s">&quot;errors&quot;</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">type</span> <span class="nx">Operation3</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">number1</span> <span class="kt">int</span>
+</span><span class='line'>  <span class="nx">number2</span> <span class="kt">int</span>
+</span><span class='line'>  <span class="nx">err</span>     <span class="kt">error</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="p">(</span>
+</span><span class='line'>  <span class="nx">ErrDivideByZero</span> <span class="p">=</span> <span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;divide by zero&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="nx">ErrSubLess</span>      <span class="p">=</span> <span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;minuend must greater or equal than reduction&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">NewOperation3</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Operation3</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">err</span> <span class="kt">error</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nx">a</span> <span class="p">&lt;</span> <span class="nx">b</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">err</span> <span class="p">=</span> <span class="nx">ErrSubLess</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="o">&amp;</span><span class="nx">Operation3</span><span class="p">{</span>
+</span><span class='line'>      <span class="nx">number1</span><span class="p">:</span> <span class="nx">a</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">number2</span><span class="p">:</span> <span class="nx">b</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">err</span><span class="p">:</span> <span class="nx">err</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation3</span><span class="p">)</span> <span class="nx">Err</span><span class="p">()</span> <span class="kt">error</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">err</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation3</span><span class="p">)</span> <span class="nx">Add</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">+</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation3</span><span class="p">)</span> <span class="nx">Sub</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">-</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation3</span><span class="p">)</span> <span class="nx">Multiply</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">*</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation3</span><span class="p">)</span> <span class="nx">Divide</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">opt</span><span class="p">.</span><span class="nx">err</span> <span class="p">=</span> <span class="nx">ErrDivideByZero</span>
+</span><span class='line'>      <span class="k">return</span> <span class="mi">0</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">/</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>  
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>调用的这个包的地方可以用如下方式调用:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">opt</span> <span class="o">:=</span> <span class="nx">NewOperation3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'><span class="k">if</span> <span class="nx">result</span> <span class="o">:=</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Divide</span><span class="p">();</span><span class="nx">opt</span><span class="p">.</span><span class="nx">Err</span><span class="p">()</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">log</span><span class="p">.</span><span class="nx">Errorf</span><span class="p">(</span><span class="nx">opt</span><span class="p">.</span><span class="nx">Err</span><span class="p">().</span><span class="nx">Error</span><span class="p">())</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>总结</h3>
+
+<p>通过调整后的代码相比于最初，有以下改进：</p>
+
+<ul>
+<li>除数等于0时会返回 <code>error</code> 信息给被调用者</li>
+<li>调用者不会修改内部数据 <code>number1</code> 和 <code>number2</code></li>
+<li><code>error</code> 在结构体重可以通过 <code>opt.Err()</code> 获取，可以使得 <code>New</code> 及其他方法只关注于本身需要返回的</li>
+<li>便于后续包的维护，比如 <code>新增乘法结果最大为1000，超过1000需要返回 error</code>, 最初版本的需要将乘法的返回类型由 <code>int</code> 改为 <code>(int, error)</code>,而调整结构后只需要修改 乘法的逻辑，调用者的逻辑都不需要修改,即:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">opt</span> <span class="o">*</span><span class="nx">Operation3</span><span class="p">)</span> <span class="nx">Multiply</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">result</span> <span class="o">:=</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number1</span> <span class="o">*</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">number2</span>
+</span><span class='line'>  <span class="k">if</span> <span class="nx">result</span> <span class="p">&gt;</span> <span class="mi">1000</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">opt</span><span class="p">.</span><span class="nx">err</span> <span class="p">=</span> <span class="nx">errors</span><span class="p">.</span><span class="nx">New</span><span class="p">(</span><span class="s">&quot;max result is 1000&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="mi">0</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">result</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>调用者可以通过 <code>opt.Err()</code> 方法来判断是否为某一特定的 <code>error</code> 类型,如:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">opt</span> <span class="o">:=</span> <span class="nx">NewOperation3</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'><span class="nx">result</span> <span class="o">:=</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Divide</span><span class="p">()</span>
+</span><span class='line'><span class="k">if</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Err</span><span class="p">()</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="o">&amp;&amp;</span> <span class="nx">opt</span><span class="p">.</span><span class="nx">Err</span><span class="p">()</span> <span class="o">!=</span> <span class="nx">ErrSubLess</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">log</span><span class="p">.</span><span class="nx">Errof</span><span class="p">(</span><span class="nx">opt</span><span class="p">.</span><span class="nx">Err</span><span class="p">.</span><span class="nx">Error</span><span class="p">())</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>本文的所有代码均放在 <a href="https://github.com/jerrybean/golang-examples/tree/master/golang_errors">golang error 示例</a></li>
+<li>欢迎大家交流拍砖</li>
+</ul>
 
 
 		
